@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Token Radar — pre-token protocols ranked by implied value</title>
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<header class="top">
+  <div class="brand"><span class="mark" aria-hidden="true"></span><div><strong>TOKEN RADAR</strong><span class="tag">radar-2 · likelihood-weighted</span></div></div>
+  <div class="top-meta"><span id="asof">Snapshot —</span><span>DefiLlama protocol index</span><span>40 watchlist · 200 ranked</span></div>
+</header>
+<main class="shell">
+  <section class="lede">
+    <div>
+      <h1>Which pre-token protocol is worth farming next?</h1>
+      <p>Every protocol that records no token is scored on its own figures — log-scaled TVL, 7-day growth, age with no token, chain breadth and a category prior — and ranked by the implied value of its launch. Exchanges, bridges and wrapped or staked products are excluded: their TVL is another token's value, not a launch. Implied value is this radar's claim, not a promise and not a price.</p>
+      <p class="note">Say it as the data says it: a protocol <em>records</em> no token. That is not proof it has none.</p>
+    </div>
+    <div class="facts" id="stats">
+      <div class="fact"><span>Watchlist covered</span><b id="st-watch">—</b></div>
+      <div class="fact"><span>Board rows</span><b id="st-board">—</b></div>
+      <div class="fact"><span>Early rows below the floor</span><b id="st-early">—</b></div>
+      <div class="fact"><span>Pre-token in snapshot</span><b id="st-pre">—</b></div>
+      <div class="fact"><span>Live-token set aside</span><b id="st-live">—</b></div>
+    </div>
+  </section>
+
+  <section class="controls" aria-label="Board controls">
+    <div class="field"><label for="q">Search</label><input id="q" type="search" placeholder="Name, slug, category or chain" autocomplete="off"></div>
+    <div class="field"><label for="category">Category</label><select id="category"><option value="all">All categories</option></select></div>
+    <div class="field"><label for="sort">Sort by</label><select id="sort"><option value="implied">Implied value</option><option value="rank">Rank</option><option value="tvl">TVL</option><option value="growth">7d change</option><option value="likelihood">Likelihood</option></select></div>
+    <label class="check"><input type="checkbox" id="watchonly"> Watchlist only</label>
+    <div class="tabs" role="group" aria-label="Token status">
+      <button type="button" id="tab-pre" aria-pressed="true">Pre-token board</button>
+      <button type="button" id="tab-live" aria-pressed="false">Live token · 24</button>
+    </div>
+    <span class="count" id="count">—</span>
+  </section>
+
+  <section id="detail" class="panel detail" hidden>
+    <button type="button" class="back" id="back">← Back to the board</button>
+    <div id="detail-body"></div>
+  </section>
+
+  <section id="boardsec" class="panel">
+    <div class="table-wrap"><table>
+      <caption>Pre-token protocols, strongest implied value first. Select a row for its model breakdown and farm plan.</caption>
+      <thead><tr>
+        <th><button type="button" data-sort="rank">Rank</button></th>
+        <th><button type="button" data-sort="name">Protocol</button></th>
+        <th><button type="button" data-sort="tvl">TVL</button></th>
+        <th><button type="button" data-sort="growth">7d</button></th>
+        <th><button type="button" data-sort="likelihood">Likelihood</button></th>
+        <th><button type="button" data-sort="implied">Implied value</button></th>
+        <th>Token</th>
+      </tr></thead>
+      <tbody id="rows"></tbody>
+    </table></div>
+    <p class="empty" id="empty" hidden>No protocol matches that filter. Clear the search or pick another category.</p>
+  </section>
+
+  <section id="livesec" class="panel" hidden>
+    <div class="table-wrap"><table>
+      <caption>Already-token: these protocols already trade, so their market cap is a fact, not a model. They are set aside from the pre-token ranking — never ranked against it.</caption>
+      <thead><tr><th>Status</th><th>Protocol</th><th>TVL</th><th>7d</th><th>Market cap</th><th>Token</th></tr></thead>
+      <tbody id="liverows"></tbody>
+    </table></div>
+  </section>
+
+  <section class="panel model">
+    <h2>How implied value is computed — radar-2</h2>
+    <p class="formula">implied = round( TVL × 0.25 × likelihood × growthMult × maturityMult )</p>
+    <p class="formula small">likelihood = 0.30·logTVL + 0.20·categoryPrior + 0.18·growth + 0.17·ageHump + 0.15·chainBreadth &nbsp;·&nbsp; growthMult = 1 + clamp(7d, −60, +120) ÷ 100 × 0.5 &nbsp;·&nbsp; maturityMult = 0.55 + 0.45·ageHump</p>
+    <div class="modelgrid">
+      <div><h3>Size, with diminishing returns</h3><p>TVL is log-scaled from the $5M floor to $10B. $100M to $1B matters far more than $5B to $6B.</p></div>
+      <div><h3>Growth, clamped</h3><p>Seven-day TVL change, clamped to −60%…+120%, so one wild week cannot crown a protocol.</p></div>
+      <div><h3>Age hump, peak 300–700 days</h3><p>Old enough to be real, young enough to still launch. Under 30 days is unproven; past 1,500 days with no token, the launch is less likely. Unknown age counts as 365 days.</p></div>
+      <div><h3>Category prior</h3><p>Dexs, Lending, Yield, Restaking, Derivatives, Prediction Markets, Risk Curators, Allocators and RWA score highest — user-facing apps with points programmes. Chains, payments and wrappers score lowest.</p></div>
+      <div><h3>Chain breadth</h3><p>log(1 + chains) rewards protocols live on several chains, capped so five chains is enough.</p></div>
+      <div><h3>What is excluded, and why</h3><p>CEX, Bridge, Canonical Bridge, Liquid Staking, Liquid Restaking and Restaked BTC, plus versioned and wrapped/staked names, are never ranked as early rows. The watchlist (40 rows) is always included regardless.</p></div>
+    </div>
+    <p class="sub">No protocol name is special-cased anywhere in the model — see <code>isRankable</code>, <code>likelihoodOf</code> and <code>impliedValue</code> in lib/model.ts. The same function scores every row; the farm plan is templated from category, chains, TVL and age.</p>
+  </section>
+</main>
+<footer class="foot"><span>Token Radar · snapshot 2026-11-14 · model radar-2 · offline page, all data in data.js</span><span>Implied value is an estimate, not financial advice.</span></footer>
+<script src="../data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
